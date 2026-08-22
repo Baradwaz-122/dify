@@ -140,6 +140,7 @@ class AdvancedChatAppRunner(WorkflowBasedAppRunner):
                 invoke_from=invoke_from,
                 user_from=user_from,
                 trace_session_id=self.application_generate_entity.extras.get("trace_session_id"),
+                call_depth=self.application_generate_entity.call_depth,
             )
         elif self.application_generate_entity.single_iteration_run or self.application_generate_entity.single_loop_run:
             # Handle single iteration or single loop run
@@ -221,6 +222,7 @@ class AdvancedChatAppRunner(WorkflowBasedAppRunner):
                 invoke_from=invoke_from,
                 root_node_id=root_node_id,
                 trace_session_id=self.application_generate_entity.extras.get("trace_session_id"),
+                call_depth=self.application_generate_entity.call_depth,
             )
 
         # RUN WORKFLOW
