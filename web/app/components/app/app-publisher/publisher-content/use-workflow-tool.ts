@@ -16,7 +16,6 @@ type UseWorkflowToolParams = {
   appMode?: AppModeEnum
   appName?: string
   appPublished: boolean
-  hasHumanInputNode: boolean
   hasPublishedVersion: boolean
   hasTriggerNode: boolean
   inputs?: InputVar[]
@@ -98,5 +97,6 @@ export function useWorkflowTool({
     message,
     openDrawer,
     published,
+    visible,
   }
 }

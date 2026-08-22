@@ -31,5 +31,4 @@ export type AppPublisherProps = {
   missingStartNode?: boolean
   hasTriggerNode?: boolean
   startNodeLimitExceeded?: boolean
-  hasHumanInputNode?: boolean
 }

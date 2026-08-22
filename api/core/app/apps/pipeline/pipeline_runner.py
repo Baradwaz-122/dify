@@ -17,6 +17,7 @@ from core.app.entities.app_invoke_entities import (
 from core.app.workflow.layers.persistence import PersistenceWorkflowInfo, WorkflowPersistenceLayer
 from core.db.session_factory import create_session
 from core.repositories.factory import WorkflowExecutionRepository, WorkflowNodeExecutionRepository
+from core.tools.workflow_as_tool.repository import WorkflowToolSourceRepository
 from core.workflow.node_factory import DifyGraphInitContext, DifyNodeFactory, get_default_root_node_id
 from core.workflow.system_variables import build_bootstrap_variables, build_system_variables
 from core.workflow.variable_pool_initializer import add_node_inputs_to_pool, add_variables_to_pool
@@ -49,6 +50,7 @@ class PipelineRunner(WorkflowBasedAppRunner):
         system_user_id: str,
         workflow_execution_repository: WorkflowExecutionRepository,
         workflow_node_execution_repository: WorkflowNodeExecutionRepository,
+        workflow_tool_source_repository: WorkflowToolSourceRepository,
         workflow_thread_pool_id: str | None = None,
     ) -> None:
         """
@@ -67,6 +69,7 @@ class PipelineRunner(WorkflowBasedAppRunner):
         self._sys_user_id = system_user_id
         self._workflow_execution_repository = workflow_execution_repository
         self._workflow_node_execution_repository = workflow_node_execution_repository
+        self._workflow_tool_source_repository = workflow_tool_source_repository
 
     def _get_app_id(self) -> str:
         return self.application_generate_entity.app_config.app_id
@@ -216,6 +219,7 @@ class PipelineRunner(WorkflowBasedAppRunner):
             call_depth=self.application_generate_entity.call_depth,
             graph_runtime_state=graph_runtime_state,
             variable_pool=variable_pool,
+            workflow_tool_source_repository=self._workflow_tool_source_repository,
         )
 
         self._queue_manager.graph_runtime_state = graph_runtime_state
