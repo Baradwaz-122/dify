@@ -11321,6 +11321,9 @@ Returns permission flags that control workspace features like member invitations
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
 | language | query | Localized policy label language | No | string, <br>**Available values:** "en", "ja", "zh" |
+| limit | query |  | No | integer |
+| page | query |  | No | integer |
+| reverse | query |  | No | boolean |
 | app_id | path |  | Yes | string (uuid) |
 
 #### Responses
@@ -11380,6 +11383,19 @@ Returns permission flags that control workspace features like member invitations
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Success | **application/json**: [ResourceWhitelist](#resourcewhitelist)<br> |
+
+### [GET] /workspaces/current/rbac/apps/{app_id}/whitelist_config
+#### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| app_id | path |  | Yes | string (uuid) |
+
+#### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | Success | **application/json**: [ResourceWhitelistConfig](#resourcewhitelistconfig)<br> |
 
 ### [DELETE] /workspaces/current/rbac/datasets/{dataset_id}/access-policies/{policy_id}/member-bindings
 #### Parameters
@@ -11449,6 +11465,9 @@ Returns permission flags that control workspace features like member invitations
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
 | language | query | Localized policy label language | No | string, <br>**Available values:** "en", "ja", "zh" |
+| limit | query |  | No | integer |
+| page | query |  | No | integer |
+| reverse | query |  | No | boolean |
 | dataset_id | path |  | Yes | string (uuid) |
 
 #### Responses
@@ -11508,6 +11527,19 @@ Returns permission flags that control workspace features like member invitations
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Success | **application/json**: [ResourceWhitelist](#resourcewhitelist)<br> |
+
+### [GET] /workspaces/current/rbac/datasets/{dataset_id}/whitelist_config
+#### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| dataset_id | path |  | Yes | string (uuid) |
+
+#### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | Success | **application/json**: [ResourceWhitelistConfig](#resourcewhitelistconfig)<br> |
 
 ### [GET] /workspaces/current/rbac/members/{member_id}/rbac-roles
 #### Parameters
@@ -21098,14 +21130,6 @@ Model class for provider quota configuration.
 | ---- | ---- | ----------- | -------- |
 | QuotaUnit | string |  |  |
 
-#### RBACResourceWhitelistScope
-
-Whitelist scopes accepted by RBAC app and dataset access config APIs.
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| RBACResourceWhitelistScope | string | Whitelist scopes accepted by RBAC app and dataset access config APIs. |  |
-
 #### RBACRole
 
 | Name | Type | Description | Required |
@@ -21376,13 +21400,19 @@ Whitelist scopes accepted by RBAC app and dataset access config APIs.
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | data | [ [ResourceUserAccessPolicies](#resourceuseraccesspolicies) ] |  | No |
-| scope | [RBACResourceWhitelistScope](#rbacresourcewhitelistscope) |  | Yes |
+| pagination | [Pagination](#pagination) |  | No |
 
 #### ResourceWhitelist
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | account_ids | [ string ] |  | No |
+
+#### ResourceWhitelistConfig
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| automatic_include_workspace_members | boolean |  | Yes |
 
 #### RestrictModel
 
@@ -22061,19 +22091,6 @@ How a draft file's content is stored.
 | page | integer, <br>**Default:** 1 |  | No |
 | total | integer |  | No |
 
-#### SkillManifest
-
-Validated metadata extracted from a Skill package.
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| description | string |  | Yes |
-| entry_path | string |  | Yes |
-| files | [ string ] |  | Yes |
-| hash | string |  | Yes |
-| name | string |  | Yes |
-| size | integer |  | Yes |
-
 #### SkillMetadataPayload
 
 | Name | Type | Description | Required |
@@ -22160,14 +22177,6 @@ Validated metadata extracted from a Skill package.
 | ---- | ---- | ----------- | -------- |
 | count | integer |  | Yes |
 | tag | string |  | Yes |
-
-#### SkillToolInferenceResult
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| cli_tools | [ [CliToolSuggestion](#clitoolsuggestion) ] |  | No |
-| inferable | boolean |  | Yes |
-| reason | string |  | No |
 
 #### SkillVersionDeleteResponse
 
@@ -22707,7 +22716,7 @@ Non-sensitive bootstrap snapshot exposed before Console or Web authentication.
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | keyword | string | Search keyword | No |
-| type | string, <br>**Available values:** "app", "knowledge", "skill", "snippet" | Tag type filter<br>*Enum:* `"app"`, `"knowledge"`, `"skill"`, `"snippet"` | Yes |
+| type | [TagType](#tagtype) | Tag type filter | Yes |
 
 #### TagListResponse
 
@@ -24983,7 +24992,16 @@ Workflow tool configuration
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| scope | [RBACResourceWhitelistScope](#rbacresourcewhitelistscope) |  | Yes |
+| automatic_include_workspace_members | boolean |  | Yes |
+
+#### _ResourceUserAccessPoliciesQuery
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| language | string | Localized policy label language | No |
+| limit | integer |  | No |
+| page | integer |  | No |
+| reverse | boolean |  | No |
 
 #### core__tools__entities__common_entities__I18nObject
 
@@ -25154,9 +25172,19 @@ FastOpenAPI proof of concept for Dify API
 | setup_at | string | Setup completion time (ISO format) | No |
 | step | string, <br>**Available values:** "finished", "not_started" | Setup step status<br>*Enum:* `"finished"`, `"not_started"` | Yes |
 
+###### VersionFeatures
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| can_replace_logo | boolean | Whether logo replacement is supported | Yes |
+| model_load_balancing_enabled | boolean | Whether model load balancing is enabled | Yes |
+
 ###### VersionResponse
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
+| can_auto_update | boolean | Whether auto-update is supported | Yes |
+| features | [VersionFeatures](#versionfeatures) | Feature flags and capabilities | Yes |
+| release_date | string | Release date of latest version | Yes |
 | release_notes | string | Release notes for latest version | Yes |
 | version | string | Latest version number | Yes |
