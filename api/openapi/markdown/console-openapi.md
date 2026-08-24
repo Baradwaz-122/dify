@@ -9271,7 +9271,7 @@ Remove one or more tag bindings from a target.
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
 | keyword | query | Search keyword | No | string |
-| type | query | Tag type filter | No | string |
+| type | query | Tag type filter | Yes | string, <br>**Available values:** "app", "knowledge", "skill", "snippet" |
 
 #### Responses
 
@@ -11321,9 +11321,6 @@ Returns permission flags that control workspace features like member invitations
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
 | language | query | Localized policy label language | No | string, <br>**Available values:** "en", "ja", "zh" |
-| limit | query |  | No | integer |
-| page | query |  | No | integer |
-| reverse | query |  | No | boolean |
 | app_id | path |  | Yes | string (uuid) |
 
 #### Responses
@@ -11452,9 +11449,6 @@ Returns permission flags that control workspace features like member invitations
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
 | language | query | Localized policy label language | No | string, <br>**Available values:** "en", "ja", "zh" |
-| limit | query |  | No | integer |
-| page | query |  | No | integer |
-| reverse | query |  | No | boolean |
 | dataset_id | path |  | Yes | string (uuid) |
 
 #### Responses
@@ -21382,7 +21376,6 @@ Whitelist scopes accepted by RBAC app and dataset access config APIs.
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | data | [ [ResourceUserAccessPolicies](#resourceuseraccesspolicies) ] |  | No |
-| pagination | [Pagination](#pagination) |  | No |
 | scope | [RBACResourceWhitelistScope](#rbacresourcewhitelistscope) |  | Yes |
 
 #### ResourceWhitelist
@@ -22068,6 +22061,19 @@ How a draft file's content is stored.
 | page | integer, <br>**Default:** 1 |  | No |
 | total | integer |  | No |
 
+#### SkillManifest
+
+Validated metadata extracted from a Skill package.
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| description | string |  | Yes |
+| entry_path | string |  | Yes |
+| files | [ string ] |  | Yes |
+| hash | string |  | Yes |
+| name | string |  | Yes |
+| size | integer |  | Yes |
+
 #### SkillMetadataPayload
 
 | Name | Type | Description | Required |
@@ -22154,6 +22160,14 @@ How a draft file's content is stored.
 | ---- | ---- | ----------- | -------- |
 | count | integer |  | Yes |
 | tag | string |  | Yes |
+
+#### SkillToolInferenceResult
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| cli_tools | [ [CliToolSuggestion](#clitoolsuggestion) ] |  | No |
+| inferable | boolean |  | Yes |
+| reason | string |  | No |
 
 #### SkillVersionDeleteResponse
 
@@ -22693,7 +22707,7 @@ Non-sensitive bootstrap snapshot exposed before Console or Web authentication.
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | keyword | string | Search keyword | No |
-| type | [TagType](#tagtype)<br>string | Tag type filter | No |
+| type | string, <br>**Available values:** "app", "knowledge", "skill", "snippet" | Tag type filter<br>*Enum:* `"app"`, `"knowledge"`, `"skill"`, `"snippet"` | Yes |
 
 #### TagListResponse
 
@@ -24971,15 +24985,6 @@ Workflow tool configuration
 | ---- | ---- | ----------- | -------- |
 | scope | [RBACResourceWhitelistScope](#rbacresourcewhitelistscope) |  | Yes |
 
-#### _ResourceUserAccessPoliciesQuery
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| language | string | Localized policy label language | No |
-| limit | integer |  | No |
-| page | integer |  | No |
-| reverse | boolean |  | No |
-
 #### core__tools__entities__common_entities__I18nObject
 
 Model class for i18n object.
@@ -25149,19 +25154,9 @@ FastOpenAPI proof of concept for Dify API
 | setup_at | string | Setup completion time (ISO format) | No |
 | step | string, <br>**Available values:** "finished", "not_started" | Setup step status<br>*Enum:* `"finished"`, `"not_started"` | Yes |
 
-###### VersionFeatures
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| can_replace_logo | boolean | Whether logo replacement is supported | Yes |
-| model_load_balancing_enabled | boolean | Whether model load balancing is enabled | Yes |
-
 ###### VersionResponse
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| can_auto_update | boolean | Whether auto-update is supported | Yes |
-| features | [VersionFeatures](#versionfeatures) | Feature flags and capabilities | Yes |
-| release_date | string | Release date of latest version | Yes |
 | release_notes | string | Release notes for latest version | Yes |
 | version | string | Latest version number | Yes |

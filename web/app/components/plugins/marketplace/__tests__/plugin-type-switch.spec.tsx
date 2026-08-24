@@ -42,7 +42,7 @@ describe('PluginTypeSwitch', () => {
     expect(screen.getByRole('button', { name: 'category.agents' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'category.triggers' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'category.extensions' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'category.bundles' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'category.bundles' })).not.toBeInTheDocument()
   })
 
   it('updates the category in the URL when selected', async () => {
