@@ -1,8 +1,8 @@
 """add workspace skill management
 
 Revision ID: a4f8d2c9e1b0
-Revises: fbdfcf5f5a6e
-Create Date: 2026-07-09 12:00:00.000000
+Revises: 925e75620b69
+Create Date: 2026-08-24 10:52:00.000000
 
 """
 
@@ -14,7 +14,7 @@ from models.types import StringUUID
 
 # revision identifiers, used by Alembic.
 revision = "a4f8d2c9e1b0"
-down_revision = "fbdfcf5f5a6e"
+down_revision = "925e75620b69"
 branch_labels = None
 depends_on = None
 
@@ -110,8 +110,52 @@ def upgrade() -> None:
     if not _has_index("agent_skill_bindings", "agent_skill_bindings_skill_idx"):
         op.create_index("agent_skill_bindings_skill_idx", "agent_skill_bindings", ["tenant_id", "skill_id"])
 
+    if not _has_table("agent_skill_binding_snapshots"):
+        op.create_table(
+            "agent_skill_binding_snapshots",
+            _uuid_column("id"),
+            _uuid_column("tenant_id"),
+            _uuid_column("agent_id"),
+            _uuid_column("config_snapshot_id"),
+            _uuid_column("skill_id"),
+            sa.Column("priority", sa.Integer(), nullable=False),
+            _uuid_column("created_by", nullable=True),
+            sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.current_timestamp()),
+            sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.func.current_timestamp()),
+            sa.PrimaryKeyConstraint("id", name="agent_skill_binding_snapshot_pkey"),
+            sa.UniqueConstraint(
+                "tenant_id",
+                "agent_id",
+                "config_snapshot_id",
+                "skill_id",
+                name="agent_skill_binding_snapshot_skill_unique",
+            ),
+            sa.UniqueConstraint(
+                "tenant_id",
+                "agent_id",
+                "config_snapshot_id",
+                "priority",
+                name="agent_skill_binding_snapshot_priority_unique",
+            ),
+        )
+    if not _has_index("agent_skill_binding_snapshots", "agent_skill_binding_snapshots_agent_snapshot_idx"):
+        op.create_index(
+            "agent_skill_binding_snapshots_agent_snapshot_idx",
+            "agent_skill_binding_snapshots",
+            ["tenant_id", "agent_id", "config_snapshot_id"],
+        )
+
 
 def downgrade() -> None:
+    if context.is_offline_mode() or _has_table("agent_skill_binding_snapshots"):
+        if context.is_offline_mode() or _has_index(
+            "agent_skill_binding_snapshots", "agent_skill_binding_snapshots_agent_snapshot_idx"
+        ):
+            op.drop_index(
+                "agent_skill_binding_snapshots_agent_snapshot_idx",
+                table_name="agent_skill_binding_snapshots",
+            )
+        op.drop_table("agent_skill_binding_snapshots")
     if context.is_offline_mode() or _has_table("agent_skill_bindings"):
         if context.is_offline_mode() or _has_index("agent_skill_bindings", "agent_skill_bindings_skill_idx"):
             op.drop_index("agent_skill_bindings_skill_idx", table_name="agent_skill_bindings")
