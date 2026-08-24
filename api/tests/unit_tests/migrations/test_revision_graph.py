@@ -5,8 +5,8 @@ import re
 from pathlib import Path
 
 _VERSIONS_DIR = Path(__file__).resolve().parents[3] / "migrations/versions"
-_REVISION_RE = re.compile(r"^revision(?:\s*:\s*str)?\s*=\s*['\"]([^'\"]+)['\"]", re.M)
-_DOWN_REVISION_RE = re.compile(r"^down_revision\s*=\s*(.+)$", re.M)
+_REVISION_RE = re.compile(r"^revision(?:\s*:\s*str)?\s*=\s*['\"]([^'\"]+)['\"]", re.MULTILINE)
+_DOWN_REVISION_RE = re.compile(r"^down_revision\s*=\s*(.+)$", re.MULTILINE)
 
 
 def _parse_down_revision(raw: str) -> tuple[str, ...]:

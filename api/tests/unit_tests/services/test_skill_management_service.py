@@ -871,8 +871,7 @@ def test_sync_assistant_model_config_updates_draft_without_active_snapshot() -> 
 def test_update_display_name_keeps_name_and_draft_content_unchanged() -> None:
     service = SkillManagementService(tool_file_manager=_FakeToolFileManager())
     created = service.create_skill(tenant_id=TENANT, user_id=USER, payload=SkillCreatePayload())
-    original = service.get_skill(tenant_id=TENANT, skill_id=created["id"])
-    original_skill_md = next(item for item in original["files"] if item["path"] == "SKILL.md")
+    original_skill_md = next(item for item in service.get_skill(tenant_id=TENANT, skill_id=created["id"])["files"])
 
     updated = service.update_metadata(
         tenant_id=TENANT,

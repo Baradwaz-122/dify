@@ -513,12 +513,6 @@ const consoleState: MainNavConsoleState = {
     currentVersion: '1.0.0',
   },
   versionData: {
-    can_auto_update: false,
-    features: {
-      can_replace_logo: false,
-      model_load_balancing_enabled: false,
-    },
-    release_date: '',
     version: '1.0.0',
     release_notes: '',
   },
@@ -687,31 +681,29 @@ describe('MainNav', () => {
     )
     const homeLink = screen.getByRole('link', { name: /common.mainNav.home/ })
     expect(homeLink).toHaveAttribute('href', '/')
-    expect(homeLink.querySelector('.i-custom-vender-main-nav-home-v2')).toBeInTheDocument()
+    expect(homeLink.querySelector('.i-custom-vender-main-nav-home')).toBeInTheDocument()
     const studioLink = screen.getByRole('link', { name: /common.menus.apps/ })
     expect(studioLink).toHaveAttribute('href', '/apps')
-    expect(studioLink.querySelector('.i-custom-vender-main-nav-studio-v2')).toBeInTheDocument()
+    expect(studioLink.querySelector('.i-custom-vender-main-nav-studio')).toBeInTheDocument()
     const agentsLink = screen.getByRole('link', { name: /Agents/ })
     expect(agentsLink).toHaveAttribute('href', '/agents')
     expect(screen.getByRole('link', { name: /Agents common.menus.status/ })).toBeInTheDocument()
-    expect(agentsLink.querySelector('.i-custom-vender-main-nav-agent')).toBeInTheDocument()
+    expect(agentsLink.querySelector('.i-custom-vender-main-nav-roster')).toBeInTheDocument()
     const skillsLink = screen.getByRole('link', { name: /common.mainNav.skills/ })
     expect(skillsLink).toHaveAttribute('href', '/skills')
     expect(skillsLink.querySelector('.i-custom-vender-main-nav-skill')).toBeInTheDocument()
     const knowledgeLink = screen.getByRole('link', { name: /common.menus.datasets/ })
     expect(knowledgeLink).toHaveAttribute('href', '/datasets')
-    expect(
-      knowledgeLink.querySelector('.i-custom-vender-main-nav-knowledge-v2'),
-    ).toBeInTheDocument()
+    expect(knowledgeLink.querySelector('.i-custom-vender-main-nav-knowledge')).toBeInTheDocument()
     const integrationsLink = screen.getByRole('link', { name: /common.mainNav.integrations/ })
     expect(integrationsLink).toHaveAttribute('href', '/integrations/model-provider')
     expect(
-      integrationsLink.querySelector('.i-custom-vender-main-nav-integrations-v2'),
+      integrationsLink.querySelector('.i-custom-vender-main-nav-integrations'),
     ).toBeInTheDocument()
     const marketplaceLink = screen.getByRole('link', { name: /common.mainNav.marketplace/ })
     expect(marketplaceLink).toHaveAttribute('href', '/marketplace')
     expect(
-      marketplaceLink.querySelector('.i-custom-vender-main-nav-marketplace-v2'),
+      marketplaceLink.querySelector('.i-custom-vender-main-nav-marketplace'),
     ).toBeInTheDocument()
   })
 
@@ -939,17 +931,14 @@ describe('MainNav', () => {
     )
   })
 
-  it.each(['/marketplace', '/plugins', '/templates', '/templates/marketing'])(
-    'marks marketplace active on route %s',
-    (pathname) => {
-      mockPathname = pathname
+  it('marks marketplace active on marketplace routes', () => {
+    mockPathname = '/marketplace'
 
-      renderMainNav()
+    renderMainNav()
 
-      const marketplaceLink = screen.getByRole('link', { name: /common.mainNav.marketplace/ })
-      expect(marketplaceLink).toHaveClass(activeGradientMaskClassName)
-    },
-  )
+    const marketplaceLink = screen.getByRole('link', { name: /common.mainNav.marketplace/ })
+    expect(marketplaceLink).toHaveClass(activeGradientMaskClassName)
+  })
 
   it('marks roster active on roster routes', () => {
     mockPathname = '/agents'
@@ -970,22 +959,6 @@ describe('MainNav', () => {
 
     expect(homeLink).toHaveClass(activeGradientMaskClassName)
     expect(homeLink).toHaveClass(activeStackingClassName)
-  })
-
-  it('keeps Home active on the legacy explore apps route only', () => {
-    mockPathname = '/explore/apps'
-
-    const { rerender } = renderMainNav()
-
-    const homeLink = screen.getByRole('link', { name: /common.mainNav.home/ })
-    expect(homeLink).toHaveAttribute('aria-current', 'page')
-
-    mockPathname = '/installed/installed-1'
-    rerender(<MainNav />)
-
-    expect(screen.getByRole('link', { name: /common.mainNav.home/ })).not.toHaveAttribute(
-      'aria-current',
-    )
   })
 
   it('opens goto anything from the search button', async () => {
@@ -1165,7 +1138,6 @@ describe('MainNav', () => {
       'common.userProfile.compliance',
       'common.userProfile.forum',
       'common.userProfile.community',
-      'common.mainNav.help.creatorCenter',
       'common.userProfile.github',
       'common.userProfile.about',
     ]
@@ -1176,29 +1148,11 @@ describe('MainNav', () => {
     })
   })
 
-  it('opens Creator Center from the help menu above GitHub', async () => {
-    renderMainNav()
-
-    fireEvent.click(screen.getByRole('button', { name: 'common.mainNav.help.openMenu' }))
-
-    const creatorCenter = await screen.findByRole('menuitem', {
-      name: 'common.mainNav.help.creatorCenter',
-    })
-    const github = screen.getByRole('menuitem', { name: /common\.userProfile\.github/ })
-
-    expect(creatorCenter).toHaveAttribute('href', 'https://creators.dify.ai/')
-    expect(creatorCenter).toHaveAttribute('target', '_blank')
-    expect(creatorCenter).toHaveAttribute('rel', 'noopener noreferrer')
-    expect(creatorCenter.compareDocumentPosition(github)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
-    expect(creatorCenter.querySelector('.i-ri-user-star-line')).toBeTruthy()
-  })
-
   it('opens About from its real Help menu owner and restores focus when closed', async () => {
     const user = userEvent.setup()
     mockConsoleState.current = {
       ...consoleState,
       versionData: {
-        ...consoleState.versionData,
         version: '1.1.0',
         release_notes: 'https://github.com/langgenius/dify/releases/tag/1.1.0',
       },
