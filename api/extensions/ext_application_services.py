@@ -64,8 +64,7 @@ def build_application_services(
             setup_required=deployment_edition != DeploymentEdition.CLOUD,
         ),
         feature_queries=FeatureQueryService(
-            features=FeatureServiceGateway(),
-            trial_models=FeatureService.get_trial_models(),
+            features=feature_gateway,
             app_dsl_version=CURRENT_APP_DSL_VERSION,
         ),
         init_validation=InitValidationService(
