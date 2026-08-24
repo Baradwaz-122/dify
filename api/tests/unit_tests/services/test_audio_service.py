@@ -63,6 +63,8 @@ import pytest
 from sqlalchemy.orm import Session
 from werkzeug.datastructures import FileStorage
 
+from core.app.entities.app_invoke_entities import CreditUsageCreatedBy
+from core.credit_usage import CreditUsageAppType
 from models.agent_config_entities import AgentSoulConfig
 from models.enums import ConversationFromSource, MessageStatus
 from models.model import App, AppMode, AppModelConfig, Message
@@ -279,7 +281,14 @@ class TestAudioServiceASR:
         # Assert
         assert result == {"text": "Transcribed text"}
         mock_model_instance.invoke_speech2text.assert_called_once()
-        mock_model_manager_class.assert_called_once_with(tenant_id=app.tenant_id, user_id="user-123")
+        mock_model_manager_class.assert_called_once_with(
+            tenant_id=app.tenant_id,
+            user_id="user-123",
+            request_metadata={
+                "app_type": CreditUsageAppType.CHATBOT,
+                "created_by": CreditUsageCreatedBy.AUDIO,
+            },
+        )
 
     @patch("services.audio_service.ModelManager.for_tenant", autospec=True)
     def test_transcript_asr_accepts_x_m4a_mimetype(
@@ -390,7 +399,14 @@ class TestAudioServiceASR:
         )
 
         assert result == {"text": "Agent transcript"}
-        mock_model_manager_class.assert_called_once_with(tenant_id=app.tenant_id, user_id="account-1")
+        mock_model_manager_class.assert_called_once_with(
+            tenant_id=app.tenant_id,
+            user_id="account-1",
+            request_metadata={
+                "app_type": CreditUsageAppType.AGENT_V2,
+                "created_by": CreditUsageCreatedBy.AUDIO,
+            },
+        )
 
     @pytest.mark.parametrize(
         "agent_soul",
@@ -582,7 +598,14 @@ class TestAudioServiceTTS:
 
         # Assert
         assert result == b"audio data"
-        mock_model_manager_class.assert_called_once_with(tenant_id=app.tenant_id, user_id="user-123")
+        mock_model_manager_class.assert_called_once_with(
+            tenant_id=app.tenant_id,
+            user_id="user-123",
+            request_metadata={
+                "app_type": CreditUsageAppType.CHATBOT,
+                "created_by": CreditUsageCreatedBy.AUDIO,
+            },
+        )
         mock_model_instance.invoke_tts.assert_called_once_with(
             content_text="Hello world",
             voice="en-US-Neural",

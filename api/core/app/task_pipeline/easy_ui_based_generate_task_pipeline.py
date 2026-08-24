@@ -14,6 +14,7 @@ from core.app.entities.app_invoke_entities import (
     AgentChatAppGenerateEntity,
     ChatAppGenerateEntity,
     CompletionAppGenerateEntity,
+    get_credit_usage_app_type,
 )
 from core.app.entities.queue_entities import (
     QueueAgentMessageEvent,
@@ -125,7 +126,9 @@ class EasyUIBasedGenerateTaskPipeline(BasedGenerateTaskPipeline[EasyUIAppGenerat
         if self._application_generate_entity.app_config.app_mode != AppMode.COMPLETION:
             # start generate conversation name thread
             self._conversation_name_generate_thread = self._message_cycle_manager.generate_conversation_name(
-                conversation_id=self._conversation_id, query=self._application_generate_entity.query
+                conversation_id=self._conversation_id,
+                query=self._application_generate_entity.query,
+                message_id=self._message_id,
             )
 
         generator = self._wrapper_process_stream_response(trace_manager=self._application_generate_entity.trace_manager)
@@ -226,7 +229,10 @@ class EasyUIBasedGenerateTaskPipeline(BasedGenerateTaskPipeline[EasyUIAppGenerat
             and text_to_speech_dict.get("enabled")
         ):
             publisher = AppGeneratorTTSPublisher(
-                tenant_id, text_to_speech_dict.get("voice", ""), text_to_speech_dict.get("language", None)
+                tenant_id,
+                text_to_speech_dict.get("voice", ""),
+                text_to_speech_dict.get("language", None),
+                get_credit_usage_app_type(self._app_config.app_mode),
             )
         for response in self._process_stream_response(publisher=publisher, trace_manager=trace_manager):
             while True:
