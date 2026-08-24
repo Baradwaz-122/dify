@@ -51,6 +51,7 @@ def build_application_services(
     redis: RedisClientWrapper,
 ) -> ApplicationServices:
     installation_state = InstallationStateRepository(client=database_client)
+    feature_gateway = FeatureServiceGateway()
     return ApplicationServices(
         explore_banner_queries=ExploreBannerQueryService(
             banners=ExploreBannerQueryRepository(client=database_client),
